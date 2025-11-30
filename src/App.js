@@ -450,12 +450,30 @@ function ConfirmScreen({ match, seatInfo, price, onBack, onConfirm }) {
       <h2 className="screen-title">تأكيد الحجز</h2>
 
       <InfoBox label="المباراة">
-        <div className="info-team-row">
-          <span className="team-icon-small">{match.homeTeamIcon}</span>
-          <span>{match.homeTeam}</span>
+        <div className="info-team-row-logos">
+          <div className="info-team">
+            <img
+              src={match.homeTeamLogo || getTeamLogo(match.homeTeam)}
+              alt={match.homeTeam}
+              className="info-team-logo"
+              onError={(e) => {
+                e.target.src = getTeamLogo(match.homeTeam);
+              }}
+            />
+            <span>{match.homeTeam}</span>
+          </div>
           <span className="vs-inline">VS</span>
-          <span>{match.awayTeam}</span>
-          <span className="team-icon-small">{match.awayTeamIcon}</span>
+          <div className="info-team">
+            <img
+              src={match.awayTeamLogo || getTeamLogo(match.awayTeam)}
+              alt={match.awayTeam}
+              className="info-team-logo"
+              onError={(e) => {
+                e.target.src = getTeamLogo(match.awayTeam);
+              }}
+            />
+            <span>{match.awayTeam}</span>
+          </div>
         </div>
       </InfoBox>
 
