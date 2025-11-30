@@ -118,7 +118,13 @@ export default function App() {
             >
               ☰
             </button>
-            <div className="top-bar-title">Aboor عبور</div>
+            <div className="top-bar-title">
+              <img
+                src="/aboor-logo.png"
+                alt="Aboor"
+                className="top-bar-logo"
+              />
+            </div>
           </header>
         )}
 
@@ -531,22 +537,38 @@ function MyTicketsScreen({ tickets, onBack }) {
       <div className="ticket-list">
         {tickets.map((t) => (
           <div key={t.id} className="ticket-card">
-            <div className="ticket-teams">
-              <div className="ticket-team-row">
-                <span className="team-icon-small">{t.match.homeTeamIcon}</span>
-                <span>{t.match.homeTeam}</span>
+            <div className="ticket-card-content">
+              <div className="ticket-card-team">
+                <img
+                  src={t.match.homeTeamLogo || getTeamLogo(t.match.homeTeam)}
+                  alt={t.match.homeTeam}
+                  className="ticket-team-logo"
+                  onError={(e) => {
+                    e.target.src = getTeamLogo(t.match.homeTeam);
+                  }}
+                />
+                <div className="ticket-team-name">{t.match.homeTeam}</div>
               </div>
-              <span className="vs-inline">VS</span>
-              <div className="ticket-team-row">
-                <span className="team-icon-small">{t.match.awayTeamIcon}</span>
-                <span>{t.match.awayTeam}</span>
+              <div className="ticket-card-vs">VS</div>
+              <div className="ticket-card-team">
+                <img
+                  src={t.match.awayTeamLogo || getTeamLogo(t.match.awayTeam)}
+                  alt={t.match.awayTeam}
+                  className="ticket-team-logo"
+                  onError={(e) => {
+                    e.target.src = getTeamLogo(t.match.awayTeam);
+                  }}
+                />
+                <div className="ticket-team-name">{t.match.awayTeam}</div>
               </div>
             </div>
+
             <div className="ticket-meta">
-              <span>{t.match.date}</span>
               <span>{t.match.stadium}</span>
+              <span>{t.match.date}</span>
             </div>
-            <div className="ticket-meta">
+
+            <div className="ticket-seat-info">
               {t.seatInfo.zone && t.seatInfo.areaNumber
                 ? `${t.seatInfo.zone} - Area ${t.seatInfo.areaNumber}`
                 : "لم يتم اختيار المنطقة"}
@@ -589,7 +611,13 @@ function SideMenu({ onClose, onMyTickets, onHome, onLogout }) {
         }}
       >
         <div className="side-menu-header">
-          <div className="side-menu-title">Aboor عبور</div>
+          <div className="side-menu-title">
+            <img
+              src="/aboor-logo.png"
+              alt="Aboor"
+              className="top-bar-logo"
+            />
+          </div>
           <button className="icon-button" onClick={onClose}>
             ✕
           </button>
