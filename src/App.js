@@ -17,7 +17,7 @@ const getTeamLogo = (teamName) => {
 const MOCK_MATCHES = [
   {
     id: 1,
-    homeTeam: "الأخضر",
+    homeTeam: "الأهلي",
     homeTeamIcon: "🟢",
     homeTeamLogo: "/Alahli.png",
     awayTeam: "الهلال",
@@ -57,7 +57,7 @@ const MOCK_MATCHES = [
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState("landing"); // landing | nafath | matches | matchDetails | confirm | payment | success | myTickets
+  const [screen, setScreen] = useState("landing"); // landing | nafath | matches | matchDetails | confirm | payment | success | myTickets | profile
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [seatInfo, setSeatInfo] = useState({
@@ -186,6 +186,10 @@ export default function App() {
           />
         )}
 
+        {screen === "profile" && (
+          <ProfileScreen onBack={() => setScreen("matches")} />
+        )}
+
         {/* SIDE MENU OVERLAY */}
         {sideMenuOpen && (
           <SideMenu
@@ -193,6 +197,10 @@ export default function App() {
             onMyTickets={() => {
               setSideMenuOpen(false);
               setScreen("myTickets");
+            }}
+            onProfile={() => {
+              setSideMenuOpen(false);
+              setScreen("profile");
             }}
             onHome={() => {
               setSideMenuOpen(false);
@@ -638,6 +646,61 @@ function MyTicketsScreen({ tickets, onBack }) {
   );
 }
 
+function ProfileScreen({ onBack }) {
+  return (
+    <div className="screen profile-screen">
+      <div className="screen-header-with-back">
+        <button className="back-button-icon" onClick={onBack}>
+          ←
+        </button>
+        <h2 className="screen-title">الملف الشخصي</h2>
+      </div>
+
+      <div className="profile-card">
+        <div className="profile-avatar">WA</div>
+        <div className="profile-name">وليد الزهراني</div>
+        <div className="profile-email">waleed@example.com</div>
+      </div>
+
+      <div className="profile-info-grid">
+        <div className="profile-info-item">
+          <div className="profile-info-label">رقم الهوية</div>
+          <div className="profile-info-value">1234567890</div>
+          <div className="profile-info-label">رقم الجوال</div>
+          <div className="profile-info-value">0500000000</div>
+          <div className="profile-info-label">البريد الإلكتروني</div>
+          <div className="profile-info-value profile-info-email">waleed@example.com</div>
+        </div>
+        <div className="profile-info-item">
+          <div className="profile-info-label">حالة الحساب</div>
+          <div className="profile-info-status">مفعل</div>
+        </div>
+      </div>
+
+      <div className="profile-section">
+        <div className="profile-section-title">التفضيلات</div>
+        <div className="profile-preference">
+          <span>الفريق المفضل</span>
+          <span className="profile-tag">الاتفاق</span>
+        </div>
+        <div className="profile-preference">
+          <span>التنبيهات</span>
+          <span className="profile-tag">مفعلة</span>
+        </div>
+        <div className="profile-preference">
+          <span>اللغة</span>
+          <span className="profile-tag">العربية</span>
+        </div>
+      </div>
+
+      <div className="profile-actions">
+        <button className="secondary-button">تحديث البيانات</button>
+        <button className="secondary-button">إدارة التنبيهات</button>
+      </div>
+    </div>
+  );
+}
+
 /* ---------------------- Shared components ---------------------- */
 
 function InfoBox({ label, children }) {
@@ -649,7 +712,7 @@ function InfoBox({ label, children }) {
   );
 }
 
-function SideMenu({ onClose, onMyTickets, onHome, onLogout }) {
+function SideMenu({ onClose, onMyTickets, onHome, onProfile, onLogout }) {
   return (
     <div className="side-menu-overlay" onClick={onClose}>
       <div
@@ -659,16 +722,17 @@ function SideMenu({ onClose, onMyTickets, onHome, onLogout }) {
         }}
       >
         <div className="side-menu-header">
-          <div className="side-menu-title">
-            <img
-              src="/aboor-logo.png"
-              alt="Aboor"
-              className="top-bar-logo"
-            />
-          </div>
-          <button className="icon-button" onClick={onClose}>
+          <button className="icon-button side-menu-close" onClick={onClose}>
             ✕
           </button>
+          <div className="side-menu-profile-block">
+            <div className="side-menu-avatar">WA</div>
+            <div className="side-menu-user-name">وليد الزهراني</div>
+            <div className="side-menu-user-email">waleed@example.com</div>
+            <button className="side-menu-profile-button" onClick={onProfile}>
+              الملف الشخصي
+            </button>
+          </div>
         </div>
         <button className="side-menu-item" onClick={onHome}>
           المباريات
