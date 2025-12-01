@@ -57,7 +57,7 @@ const MOCK_MATCHES = [
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState("login"); // login | matches | matchDetails | confirm | payment | success | myTickets
+  const [screen, setScreen] = useState("landing"); // landing | nafath | matches | matchDetails | confirm | payment | success | myTickets
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [seatInfo, setSeatInfo] = useState({
@@ -110,7 +110,7 @@ export default function App() {
     <div className="app-root">
       <div className="phone-frame">
         {/* Top bar with app title + menu */}
-        {screen !== "login" && (
+        {screen !== "landing" && screen !== "nafath" && (
           <header className="top-bar">
             <button
               className="icon-button"
@@ -129,7 +129,16 @@ export default function App() {
         )}
 
         {/* SCREENS */}
-        {screen === "login" && <LoginScreen onLogin={handleLogin} />}
+        {screen === "landing" && (
+          <LandingScreen onContinue={() => setScreen("nafath")} />
+        )}
+
+        {screen === "nafath" && (
+          <NafathLoginScreen
+            onBack={() => setScreen("landing")}
+            onLogin={handleLogin}
+          />
+        )}
 
         {screen === "matches" && (
           <MatchListScreen
@@ -191,7 +200,7 @@ export default function App() {
             }}
             onLogout={() => {
               setSideMenuOpen(false);
-              setScreen("login");
+              setScreen("landing");
             }}
           />
         )}
@@ -202,29 +211,50 @@ export default function App() {
 
 /* ---------------------- Screens ---------------------- */
 
-function LoginScreen({ onLogin }) {
+function LandingScreen({ onContinue }) {
   return (
-    <div className="screen login-screen">
-      <div className="nafath-logo">نفاذ</div>
-      <label className="field-label">رقم السجل المدني</label>
-      <input
-        type="text"
-        className="input"
-        placeholder="رقم السجل المدني"
-      />
-      <div className="captcha-placeholder">reCAPTCHA</div>
-      <button className="primary-button" onClick={onLogin}>
-        تسجيل الدخول
-      </button>
-
-      <div className="store-links">
-        <div className="store-badge">Download on App Store</div>
-        <div className="store-badge">Get it on Google Play</div>
+    <div className="screen landing-screen">
+      <div className="landing-card">
+        <img src="/aboor-logo.png" alt="Aboor" className="landing-logo" />
+        <h1 className="landing-title">منصة عبور</h1>
+        <p className="landing-description">
+          تابع إلى نفاذ للتحقق من هويتك ثم عد إلى منصة عبور لإدارة تذاكرك بسهولة.
+        </p>
+        <button className="primary-button" onClick={onContinue}>
+          تسجيل الدخول عبر نفاذ
+        </button>
       </div>
+    </div>
+  );
+}
 
-      <p className="hint-text">
-        لا يوجد لديك حساب نفاذ؟ يمكنك تسجيل الدخول باستخدام حساب أبشر.
-      </p>
+function NafathLoginScreen({ onLogin, onBack }) {
+  return (
+    <div className="screen nafath-screen">
+      <button className="nafath-back" onClick={onBack}>
+        ← العودة
+      </button>
+      <div className="nafath-card">
+        <div className="nafath-header">
+          <div className="nafath-logo-word">نفاذ</div>
+          <div className="nafath-subtitle">النفاذ الوطني الموحد</div>
+          <p>مرحباً بك عميل المركز الوطني للتحول الإلكتروني</p>
+        </div>
+        <div className="nafath-section-title">الدخول عبر تطبيق نفاذ</div>
+        <label className="nafath-label">رقم الهوية *</label>
+        <input
+          type="text"
+          className="nafath-input"
+          placeholder="أدخل رقم الهوية"
+        />
+        <button className="nafath-login-button" onClick={onLogin}>
+          تسجيل الدخول
+        </button>
+        <div className="nafath-divider">أو باستخدام</div>
+        <button className="nafath-secondary-button">
+          اسم المستخدم وكلمة المرور
+        </button>
+      </div>
     </div>
   );
 }
