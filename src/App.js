@@ -60,6 +60,7 @@ export default function App() {
   const [screen, setScreen] = useState("landing"); // landing | nafath | matches | matchDetails | confirm | payment | success | myTickets | profile
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const [seatInfo, setSeatInfo] = useState({
     zone: "",
     areaNumber: "",
@@ -125,6 +126,13 @@ export default function App() {
                 className="top-bar-logo"
               />
             </div>
+            <button
+              className="icon-button"
+              style={{width: "30px", height: "30px"}}
+            >
+              
+            </button>
+
           </header>
         )}
 
@@ -183,11 +191,22 @@ export default function App() {
           <MyTicketsScreen
             tickets={tickets}
             onBack={() => setScreen("matches")}
+            onViewDetails={(ticket) => {
+              setSelectedTicket(ticket);
+              setScreen("ticketDetails");
+            }}
           />
         )}
 
         {screen === "profile" && (
           <ProfileScreen onBack={() => setScreen("matches")} />
+        )}
+
+        {screen === "ticketDetails" && selectedTicket && (
+          <TicketDetailsScreen
+            ticket={selectedTicket}
+            onBack={() => setScreen("myTickets")}
+          />
         )}
 
         {/* SIDE MENU OVERLAY */}
@@ -581,7 +600,7 @@ function SuccessScreen({ onGoTickets }) {
   );
 }
 
-function MyTicketsScreen({ tickets, onBack }) {
+function MyTicketsScreen({ tickets, onBack, onViewDetails }) {
   return (
     <div className="screen">
       <h2 className="screen-title">تذاكري</h2>
@@ -630,7 +649,12 @@ function MyTicketsScreen({ tickets, onBack }) {
                 : "لم يتم اختيار المنطقة"}
             </div>
             <div className="ticket-actions">
-              <button className="secondary-button small">التفاصيل</button>
+              <button
+                className="secondary-button small"
+                onClick={() => onViewDetails(t)}
+              >
+                التفاصيل
+              </button>
               <button className="secondary-button small">
                 إعادة البيع
               </button>
@@ -642,6 +666,98 @@ function MyTicketsScreen({ tickets, onBack }) {
       <button className="secondary-button" onClick={onBack}>
         رجوع إلى المباريات
       </button>
+    </div>
+  );
+}
+
+const QR_PATTERN = [
+  [1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1],
+  [1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1],
+  [1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+  [1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1],
+  [0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0],
+  [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0],
+  [0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0],
+  [1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+  [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0],
+  [1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1],
+  [1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1],
+];
+
+function TicketDetailsScreen({ ticket, onBack }) {
+  const seatLabel =
+    ticket.seatInfo.zone && ticket.seatInfo.areaNumber
+      ? `${ticket.seatInfo.zone} - Area ${ticket.seatInfo.areaNumber}`
+      : "لم يتم اختيار المنطقة";
+
+  return (
+    <div className="screen">
+      <div className="screen-header-with-back">
+        <button className="back-button-icon" onClick={onBack}>
+          ←
+        </button>
+        <h2 className="screen-title">تفاصيل التذكرة</h2>
+      </div>
+
+      <div className="ticket-details-card">
+        <div className="ticket-details-match">
+          <div className="match-header-team">
+            <img
+              src={ticket.match.homeTeamLogo || getTeamLogo(ticket.match.homeTeam)}
+              alt={ticket.match.homeTeam}
+              className="team-logo-large"
+              onError={(e) => {
+                e.target.src = getTeamLogo(ticket.match.homeTeam);
+              }}
+            />
+            <div className="team-name-large">{ticket.match.homeTeam}</div>
+          </div>
+          <span className="vs-inline-large">VS</span>
+          <div className="match-header-team">
+            <img
+              src={ticket.match.awayTeamLogo || getTeamLogo(ticket.match.awayTeam)}
+              alt={ticket.match.awayTeam}
+              className="team-logo-large"
+              onError={(e) => {
+                e.target.src = getTeamLogo(ticket.match.awayTeam);
+              }}
+            />
+            <div className="team-name-large">{ticket.match.awayTeam}</div>
+          </div>
+        </div>
+
+        <div className="ticket-detail-info">
+          <span>التاريخ</span>
+          <strong>{ticket.match.date}</strong>
+        </div>
+        <div className="ticket-detail-info">
+          <span>الملعب</span>
+          <strong>{ticket.match.stadium}</strong>
+        </div>
+        <div className="ticket-detail-info">
+          <span>المقعد</span>
+          <strong>{seatLabel}</strong>
+        </div>
+        <div className="ticket-detail-info">
+          <span>السعر</span>
+          <strong>{ticket.match.price} SAR</strong>
+        </div>
+
+        <div className="ticket-qr">
+          <div className="ticket-qr-grid">
+            {QR_PATTERN.map((row, rowIndex) =>
+              row.map((cell, cellIndex) => (
+                <span
+                  key={`${rowIndex}-${cellIndex}`}
+                  className={`qr-cell ${cell ? "filled" : ""}`}
+                />
+              ))
+            )}
+          </div>
+          <div className="ticket-qr-id">{`AB${String(ticket.id).slice(-6)}`}</div>
+        </div>
+      </div>
     </div>
   );
 }
